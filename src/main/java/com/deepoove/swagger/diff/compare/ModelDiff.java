@@ -30,28 +30,28 @@ public class ModelDiff {
 	Map<String, Model> newDedinitions;
 
 	private ModelDiff() {
-		increased = new ArrayList<ElProperty>();
-		missing = new ArrayList<ElProperty>();
-		changed = new ArrayList<ElProperty>();
+		increased = new ArrayList<>();
+		missing = new ArrayList<>();
+		changed = new ArrayList<>();
 	}
 
-	public static ModelDiff buildWithDefinition(Map<String, Model> left,
-			Map<String, Model> right) {
+	public static ModelDiff buildWithDefinition(final Map<String, Model> left,
+			final Map<String, Model> right) {
 		ModelDiff diff = new ModelDiff();
 		diff.oldDedinitions = left;
 		diff.newDedinitions = right;
 		return diff;
 	}
 
-	public ModelDiff diff(Model leftModel, Model rightModel) {
+	public ModelDiff diff(final Model leftModel, final Model rightModel) {
 		return this.diff(leftModel, rightModel, null, new HashSet<Model>());
 	}
 
-	public ModelDiff diff(Model leftModel, Model rightModel, String parentEl) {
+	public ModelDiff diff(final Model leftModel, final Model rightModel, final String parentEl) {
 		return this.diff(leftModel, rightModel, parentEl, new HashSet<Model>());
 	}
 
-	private ModelDiff diff(Model leftModel, Model rightModel, String parentEl, Set<Model> visited) {
+	private ModelDiff diff(final Model leftModel, final Model rightModel, final String parentEl, final Set<Model> visited) {
 		// Stop recursing if both models are null
 		// OR either model is already contained in the visiting history
 		if ((null == leftModel && null == rightModel) || visited.contains(leftModel) || visited.contains(rightModel)) {
@@ -83,39 +83,42 @@ public class ModelDiff {
 			} else if (left != null && right != null && !left.equals(right)) {
 				// Add a changed ElProperty if not a Reference
 			    // Useless
-				changed.add(convert2ElProperty(key, parentEl, left));
+				changed.add(convert2ElProperty(key, parentEl, left, right));
 			}
 		});
 		return this;
 	}
 
 	private Collection<? extends ElProperty> convert2ElPropertys(
-			Map<String, Property> propMap, String parentEl) {
+			final Map<String, Property> propMap, final String parentEl) {
 
-		List<ElProperty> result = new ArrayList<ElProperty>();
-		if (null == propMap) return result;
+		List<ElProperty> result = new ArrayList<>();
+		if (null == propMap) {
+			return result;
+		}
 
 		for (Entry<String, Property> entry : propMap.entrySet()) {
 		    // TODO Recursively get the properties
-			result.add(convert2ElProperty(entry.getKey(), parentEl, entry.getValue()));
+			result.add(convert2ElProperty(entry.getKey(), parentEl, entry.getValue(), null));
 		}
 		return result;
 	}
 
-	private String buildElString(String parentEl, String propName) {
+	private String buildElString(final String parentEl, final String propName) {
 		return null == parentEl ? propName : (parentEl + "." + propName);
 	}
 
-	private ElProperty convert2ElProperty(String propName, String parentEl, Property property) {
+	private ElProperty convert2ElProperty(final String propName, final String parentEl, final Property property, final Property right) {
 		ElProperty pWithPath = new ElProperty();
 		pWithPath.setProperty(property);
+		pWithPath.setRightProperty(right);
 		pWithPath.setEl(buildElString(parentEl, propName));
 		return pWithPath;
 	}
 
 	@SuppressWarnings("unchecked")
-    private <T> Set<T> copyAndAdd(Set<T> set, T... add) {
-		Set<T> newSet = new HashSet<T>(set);
+    private <T> Set<T> copyAndAdd(final Set<T> set, final T... add) {
+		Set<T> newSet = new HashSet<>(set);
 		newSet.addAll(Arrays.asList(add));
 		return newSet;
 	}
@@ -124,7 +127,7 @@ public class ModelDiff {
 		return increased;
 	}
 
-	public void setIncreased(List<ElProperty> increased) {
+	public void setIncreased(final List<ElProperty> increased) {
 		this.increased = increased;
 	}
 
@@ -132,7 +135,7 @@ public class ModelDiff {
 		return missing;
 	}
 
-	public void setMissing(List<ElProperty> missing) {
+	public void setMissing(final List<ElProperty> missing) {
 		this.missing = missing;
 	}
 
@@ -140,7 +143,7 @@ public class ModelDiff {
 		return changed;
 	}
 
-	public void setChanged(List<ElProperty> changed) {
+	public void setChanged(final List<ElProperty> changed) {
 		this.changed = changed;
 	}
 }

@@ -4,28 +4,38 @@ import io.swagger.models.properties.Property;
 
 /**
  * property with expression Language grammar
+ * 
  * @author Sayi
- * @version 
+ * @version
  */
 public class ElProperty {
 
 	private String el;
 
-	private Property property;
+	private Property leftProperty;
+	private Property rightProperty;
 
 	public Property getProperty() {
-		return property;
+		return leftProperty;
 	}
 
-	public void setProperty(Property property) {
-		this.property = property;
+	public void setProperty(final Property property) {
+		this.leftProperty = property;
+	}
+
+	public Property getRightProperty() {
+		return rightProperty;
+	}
+
+	public void setRightProperty(final Property property) {
+		this.rightProperty = property;
 	}
 
 	public String getEl() {
 		return el;
 	}
 
-	public void setEl(String el) {
+	public void setEl(final String el) {
 		this.el = el;
 	}
 
