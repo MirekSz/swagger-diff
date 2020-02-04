@@ -172,7 +172,7 @@ public class HtmlRender implements Render {
         List<ElProperty> delProps = changedOperation.getMissingProps();
         ContainerTag ul = ul().withClass("change response");
         for (ElProperty prop : addProps) {
-            ul.with(li_addProp(prop));
+			ul.with(li_addProp(prop, null));
         }
         for (ElProperty prop : delProps) {
             ul.with(li_missingProp(prop));
@@ -186,7 +186,11 @@ public class HtmlRender implements Render {
         return li().withClass("missing").withText("Delete").with(del(prop.getEl())).with(span(null == property.getDescription() ? "" : ("//" + property.getDescription())).withClass("comment"));
     }
 
-    private ContainerTag li_addProp(final ElProperty prop) {
+	private ContainerTag li_addProp(final ElProperty prop, final String root) {
+		if (root != null && prop.getEl().startsWith(root)) {
+			prop.setEl(prop.getEl().replaceFirst(root + "\\.", ""));
+		}
+
         Property property = prop.getProperty();
         return li().withText("Add " + prop.getEl()).with(span(null == property.getDescription() ? "" : ("//" + property.getDescription())).withClass("comment"));
     }
@@ -202,7 +206,7 @@ public class HtmlRender implements Render {
         for (ChangedParameter param : changedParameters) {
             List<ElProperty> increased = param.getIncreased();
             for (ElProperty prop : increased) {
-                ul.with(li_addProp(prop));
+				ul.with(li_addProp(prop, param.getLeftParameter().getName()));
             }
         }
         for (ChangedParameter param : changedParameters) {
@@ -255,13 +259,13 @@ public class HtmlRender implements Render {
 					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
 			if (changeRequiredI || changeDescriptionI) {
 				ContainerTag li = li().withText(elProperty.getEl());
-				li.withText(" change into " + (elProperty.getRightProperty().getRequired() ? "required" : "not required"));
+				li.withText(" change into " + (elProperty.getRightProperty().getRequired() ? "required" : "not required")+".");
 
 				ul.with(li);
 				if (changeDescriptionI) {
-					li.withText(" Notes ").with(del(elProperty.getProperty().getDescription()).withClass("comment"))
-							.withText(" change into ").with(span(span(null == elProperty.getRightProperty().getDescription() ? ""
-									: elProperty.getRightProperty().getDescription()).withClass("comment")));
+					li.withText(" Notes").with(del(elProperty.getProperty().getDescription()).withClass("comment"))
+							.withText(" change into").with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
+									: elProperty.getRightProperty().getDescription())).withClass("comment")));
 				}
 			}
 		}

@@ -108,11 +108,13 @@ public class ModelDiff {
 		return null == parentEl ? propName : (parentEl + "." + propName);
 	}
 
+
 	private ElProperty convert2ElProperty(final String propName, final String parentEl, final Property property, final Property right) {
 		ElProperty pWithPath = new ElProperty();
 		pWithPath.setProperty(property);
 		pWithPath.setRightProperty(right);
-		pWithPath.setEl(buildElString(parentEl, propName));
+		String buildElString = buildElString(parentEl, propName);
+		pWithPath.setEl(buildElString);
 		return pWithPath;
 	}
 
