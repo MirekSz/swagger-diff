@@ -20,7 +20,7 @@ import io.swagger.models.properties.Property;
 
 /**
  * compare two Swagger
- * 
+ *
  * @author Sayi
  *
  */
@@ -32,7 +32,7 @@ public class SpecificationDiff {
 
     private SpecificationDiff() {}
 
-    public static SpecificationDiff diff(Swagger oldSpec, Swagger newSpec) {
+    public static SpecificationDiff diff(final Swagger oldSpec, final Swagger newSpec) {
         if (null == oldSpec || null == newSpec) { throw new IllegalArgumentException(
                 "cannot diff null spec."); }
         SpecificationDiff instance = new SpecificationDiff();
@@ -79,6 +79,7 @@ public class SpecificationDiff {
                 changedOperation.setAddParameters(parameterDiff.getIncreased());
                 changedOperation.setMissingParameters(parameterDiff.getMissing());
                 changedOperation.setChangedParameter(parameterDiff.getChanged());
+				changedOperation.setOperation(newOperation);
 
                 // Diff response
                 Property oldResponseProperty = getResponseProperty(oldOperation);
@@ -110,17 +111,21 @@ public class SpecificationDiff {
 
     }
 
-    private static Property getResponseProperty(Operation operation) {
+    private static Property getResponseProperty(final Operation operation) {
         Map<String, Response> responses = operation.getResponses();
         // temporary workaround for missing response messages
-        if (responses == null) return null;
+        if (responses == null) {
+			return null;
+		}
         Response response = responses.get("200");
         return null == response ? null : response.getSchema();
     }
 
-    private static List<Endpoint> convert2EndpointList(Map<String, Path> map) {
-        List<Endpoint> endpoints = new ArrayList<Endpoint>();
-        if (null == map) return endpoints;
+    private static List<Endpoint> convert2EndpointList(final Map<String, Path> map) {
+        List<Endpoint> endpoints = new ArrayList<>();
+        if (null == map) {
+			return endpoints;
+		}
         map.forEach((url, path) -> {
             Map<HttpMethod, Operation> operationMap = path.getOperationMap();
             operationMap.forEach((httpMethod, operation) -> {
@@ -136,10 +141,12 @@ public class SpecificationDiff {
         return endpoints;
     }
 
-    private static Collection<? extends Endpoint> convert2EndpointList(String pathUrl,
-            Map<HttpMethod, Operation> map) {
-        List<Endpoint> endpoints = new ArrayList<Endpoint>();
-        if (null == map) return endpoints;
+    private static Collection<? extends Endpoint> convert2EndpointList(final String pathUrl,
+            final Map<HttpMethod, Operation> map) {
+        List<Endpoint> endpoints = new ArrayList<>();
+        if (null == map) {
+			return endpoints;
+		}
         map.forEach((httpMethod, operation) -> {
             Endpoint endpoint = new Endpoint();
             endpoint.setPathUrl(pathUrl);
