@@ -214,7 +214,7 @@ public class HtmlRender implements Render {
 				.with(span().withText((prop.getUProperty().getRequired() ? "required" : "not required"))
 						.withClass(prop.getUProperty().getRequired() ? "missing" : ""))
 				.withText(" " + prop.getEl())
-				.with(span(null == property.getDescription() ? "" : ("//" + property.getDescription())).withClass("comment"));
+				.with(span(null == property.getDescription() ? "" : (" //" + property.getDescription())).withClass("comment"));
     }
 
 	private ContainerTag ul_param(final ChangedOperation changedOperation) {
@@ -253,11 +253,12 @@ public class HtmlRender implements Render {
 
     private ContainerTag li_addParam(final Parameter param) {
 		return li().withText("Add " + param.getName())
-				.with(span(null == param.getDescription() ? "" : ("//" + param.getDescription())).withClass("comment"));
+				.with(span(null == param.getDescription() ? "" : (" //" + param.getDescription())).withClass("comment"));
     }
 
 	private ContainerTag li_missingParam(final Parameter param) {
-        return li().withClass("missing").with(span("Delete")).with(del(param.getName())).with(span(null == param.getDescription() ? "" : ("//" + param.getDescription())).withClass("comment"));
+		return li().withClass("missing").with(span("Delete")).with(del(param.getName()))
+				.with(span(null == param.getDescription() ? "" : (" //" + param.getDescription())).withClass("comment"));
     }
 
 	private ContainerTag li_changedParam(final ChangedParameter changeParam) {
@@ -299,15 +300,16 @@ public class HtmlRender implements Render {
 					nestedUl.with(li().withText("notes ").with(del(elProperty.getProperty().getDescription()))
 							.withText(" change into ")
 							.with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
-									: elProperty.getRightProperty().getDescription()))))
+									: elProperty.getRightProperty().getDescription()))).withClass("comment"))
 					)
 					;
 				}
 				if (changeSizesI) {
 					Integer maxLength = ((StringProperty) elProperty.getProperty()).getMaxLength();
 					nestedUl.with(li().withText("maxLength ").with(del(maxLength + ""))
-							.withText(" change into "
-							+ ((StringProperty) elProperty.getRightProperty()).getMaxLength()));
+							.withText(" change into ")
+							.with(span().withText(((StringProperty) elProperty.getRightProperty()).getMaxLength() + "")
+									.withClass("comment")));
 				}
 			}
 		}
