@@ -37,6 +37,7 @@ import com.deepoove.swagger.diff.model.ElProperty;
 import com.deepoove.swagger.diff.model.Endpoint;
 
 import io.swagger.models.HttpMethod;
+import io.swagger.models.Operation;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.properties.Property;
 import j2html.tags.ContainerTag;
@@ -47,7 +48,7 @@ public class HtmlRender implements Render {
     private final String linkCss;
 
     public HtmlRender() {
-        this("Api Change Log", "http://deepoove.com/swagger-diff/stylesheets/demo.css");
+		this("Api Change Log", "http://deepoove.com/swagger-diff/stylesheets/demo.css");
     }
 
     public HtmlRender(final String title, final String linkCss) {
@@ -111,15 +112,16 @@ public class HtmlRender implements Render {
         ContainerTag ol = ol().withId("new");
         for (Endpoint endpoint : endpoints) {
             ol.with(li_newEndpoint(endpoint.getMethod().toString(),
-					endpoint.getPathUrl(), endpoint.getSummary(), endpoint.getOperation().getTags()));
+					endpoint.getPathUrl(), endpoint.getSummary(), endpoint.getOperation()));
         }
         return ol;
     }
 
     private ContainerTag li_newEndpoint(final String method, final String path,
-			final String desc, final List<String> list) {
-        return li().with(span(method).withClass(method)).withText(path + " ")
-				.with(span(null == desc ? "" : desc)).attr("tag", list.get(0));
+			final String desc, final Operation operation) {
+		return li().with(
+				addlinkToDoc(operation, path).with(span(method).withClass(method)).withText(path + " ")
+						.with(span(null == desc ? "" : desc)));
     }
 
     private ContainerTag ol_missingEndpoint(final List<Endpoint> endpoints) {
@@ -140,11 +142,15 @@ public class HtmlRender implements Render {
             del().withText(path)).with(span(null == desc ? "" : " " + desc));
     }
 
+	private ContainerTag div_expandable(final String title, final String type) {
+		return span().with(a(rawHtml("&uArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick",
+				"javascript:showHide('" + type + "');"));
+	}
     private ContainerTag ol_changed(final List<ChangedEndpoint> changedEndpoints) {
         if (null == changedEndpoints) {
 			return ol().withId("changed");
 		}
-        ContainerTag ol = ol().withId("changed");
+		ContainerTag ol = ol().withId("changed");
         for (ChangedEndpoint changedEndpoint : changedEndpoints) {
             String pathUrl = changedEndpoint.getPathUrl();
             Map<HttpMethod, ChangedOperation> changedOperations = changedEndpoint.getChangedOperations();
@@ -153,19 +159,27 @@ public class HtmlRender implements Render {
                 ChangedOperation changedOperation = entry.getValue();
                 String desc = changedOperation.getSummary();
 
-                ContainerTag ul_detail = ul().withClass("detail");
+				ContainerTag ul_detail = ul().withClass("detail");
                 if (changedOperation.isDiffParam()) {
 					ul_detail.with(li().with(h3("Parameter")).with(ul_param(changedOperation)));
                 }
                 if (changedOperation.isDiffProp()) {
                     ul_detail.with(li().with(h3("Return Type")).with(ul_response(changedOperation)));
                 }
-                ol.with(li().with(span(method).withClass(method)).withText(pathUrl + " ").with(span(null == desc ? "" : desc))
-						.with(ul_detail)).attr("tag", changedOperation.getOperation().getTags().get(0));
+				ol.with(li().with(span(method).withClass(method)).with(div_expandable("a", pathUrl)).with(
+						addlinkToDoc(changedOperation.getOperation(), pathUrl).withText(pathUrl + " ")
+								.with(span(null == desc ? "" : desc)))
+
+						.with(ul_detail.withId(pathUrl)));
+
             }
         }
         return ol;
     }
+
+	private ContainerTag addlinkToDoc(final Operation operation, final String path) {
+		return a().withHref("#" + operation.getTags().get(0) + "$" + path).withTarget("_blank");
+	}
 
     private ContainerTag ul_response(final ChangedOperation changedOperation) {
         List<ElProperty> addProps = changedOperation.getAddProps();
@@ -260,17 +274,26 @@ public class HtmlRender implements Render {
 			boolean changeRequiredI = elProperty.getProperty().getRequired() != elProperty.getRightProperty().getRequired();
 			boolean changeDescriptionI =
 					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
+			boolean changeSizesI =
+					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
 			if (changeRequiredI || changeDescriptionI) {
-				ContainerTag li = li().withText(elProperty.getEl());
-				li.withText(" change into " + (elProperty.getRightProperty().getRequired() ? "required" : "not required")+".");
-
+				ContainerTag nestedUl = ul().withClass("nested");
+				ContainerTag li = li().withText(elProperty.getEl()).with(nestedUl);
 				ul.with(li);
+
+				nestedUl.with(
+						li().withText(" change into " + (elProperty.getRightProperty().getRequired() ? "required" : "not required") + "."));
+
 				if (changeDescriptionI) {
-					li.withText(" Notes").with(del(elProperty.getProperty().getDescription()).withClass("comment"))
-							.withText(" change into").with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
-									: elProperty.getRightProperty().getDescription())).withClass("comment")));
+					nestedUl.with(li().withText("notes").with(del(elProperty.getProperty().getDescription()).withClass("comment"))
+							.withText(" change into")
+							.with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
+									: elProperty.getRightProperty().getDescription())).withClass("comment"))));
 				}
 			}
 		}
 	}
+
+
+
 }

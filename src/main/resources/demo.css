@@ -34,7 +34,7 @@ small { font-size: 14px; } /* 小于 12px 的中文很难阅读，让 small 正�
 ul, ol { list-style: none; }
 
 /** 重置文本格式元素 **/
-a { text-decoration: none; }
+a { text-decoration: none; color:inherit}
 a:hover { text-decoration: underline; }
 
 
@@ -90,7 +90,7 @@ h3 {
 	display: inline-block;
 	border-radius: 2px;
 	padding: 0px 4px;
-	
+
 }
 
 .article {
@@ -132,7 +132,10 @@ h3 {
 hr {
 	color: #dfdfdf;
 }
-
+ul.nested>li {
+	margin: 10px 40px;
+	 list-style-type: circle;
+}
 ol>li {
 	margin: 24px;
 }
@@ -173,10 +176,10 @@ s, del, .missing, del.comment {
 	color: #F44336;
 }
 
-/* Class for link show/hide article */ 
+/* Class for link show/hide article */
 .showhide {
     color: #3e373785;
-    text-decoration: none; 
+    text-decoration: none;
     padding: 2px;
     font-size: 12px;
     float: right;
