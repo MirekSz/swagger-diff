@@ -40,6 +40,7 @@ import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.properties.Property;
+import io.swagger.models.properties.StringProperty;
 import j2html.tags.ContainerTag;
 
 public class HtmlRender implements Render {
@@ -209,7 +210,6 @@ public class HtmlRender implements Render {
 		}
 
         Property property = prop.getProperty();
-		// .withClass(prop.getUProperty().getRequired() ? "missing" : "")
 		return li().withText("Add ")
 				.with(span().withText((prop.getUProperty().getRequired() ? "required" : "not required"))
 						.withClass(prop.getUProperty().getRequired() ? "missing" : ""))
@@ -280,8 +280,10 @@ public class HtmlRender implements Render {
 			boolean changeRequiredI = elProperty.getProperty().getRequired() != elProperty.getRightProperty().getRequired();
 			boolean changeDescriptionI =
 					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
-			boolean changeSizesI =
-					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
+			boolean changeSizesI = false;
+			if (elProperty.getProperty() instanceof StringProperty) {
+				changeSizesI = maxChanged(elProperty);
+			}
 			if (changeRequiredI || changeDescriptionI) {
 				ContainerTag nestedUl = ul().withClass("nested");
 				ContainerTag li = li().withText(elProperty.getEl()).with(nestedUl);
@@ -296,8 +298,26 @@ public class HtmlRender implements Render {
 							.with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
 									: elProperty.getRightProperty().getDescription())).withClass("comment"))));
 				}
+				if (changeSizesI) {
+					nestedUl.with(li().withText("maxLength " + ((StringProperty) elProperty.getProperty()).getMaxLength() + " change into "
+							+ ((StringProperty) elProperty.getRightProperty()).getMaxLength()));
+				}
 			}
 		}
+	}
+
+	private boolean maxChanged(final ElProperty elProperty) {
+		Integer maximum = ((StringProperty) elProperty.getProperty()).getMaxLength();
+		Integer maximum2 = ((StringProperty) elProperty.getUProperty()).getMaxLength();
+		if (maximum == null && maximum2 != null) {
+			return true;
+		}
+		if (maximum == null && maximum2 == null) {
+			return false;
+		}
+		return !maximum
+				.equals(
+						maximum2);
 	}
 
 
