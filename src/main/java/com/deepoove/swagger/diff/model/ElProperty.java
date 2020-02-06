@@ -4,7 +4,7 @@ import io.swagger.models.properties.Property;
 
 /**
  * property with expression Language grammar
- * 
+ *
  * @author Sayi
  * @version
  */
@@ -15,6 +15,9 @@ public class ElProperty {
 	private Property leftProperty;
 	private Property rightProperty;
 
+	public Property getUProperty() {
+		return rightProperty != null ? rightProperty : leftProperty;
+	}
 	public Property getProperty() {
 		return leftProperty;
 	}

@@ -209,7 +209,12 @@ public class HtmlRender implements Render {
 		}
 
         Property property = prop.getProperty();
-        return li().withText("Add " + prop.getEl()).with(span(null == property.getDescription() ? "" : ("//" + property.getDescription())).withClass("comment"));
+		// .withClass(prop.getUProperty().getRequired() ? "missing" : "")
+		return li().withText("Add ")
+				.with(span().withText((prop.getUProperty().getRequired() ? "required" : "not required"))
+						.withClass(prop.getUProperty().getRequired() ? "missing" : ""))
+				.withText(" " + prop.getEl())
+				.with(span(null == property.getDescription() ? "" : ("//" + property.getDescription())).withClass("comment"));
     }
 
 	private ContainerTag ul_param(final ChangedOperation changedOperation) {
@@ -247,7 +252,8 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag li_addParam(final Parameter param) {
-        return li().withText("Add " + param.getName()).with(span(null == param.getDescription() ? "" : ("//" + param.getDescription())).withClass("comment"));
+		return li().withText("Add " + param.getName())
+				.with(span(null == param.getDescription() ? "" : ("//" + param.getDescription())).withClass("comment"));
     }
 
 	private ContainerTag li_missingParam(final Parameter param) {
