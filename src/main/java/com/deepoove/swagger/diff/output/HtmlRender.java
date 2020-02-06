@@ -290,16 +290,23 @@ public class HtmlRender implements Render {
 				ul.with(li);
 
 				nestedUl.with(
-						li().withText(" change into " + (elProperty.getRightProperty().getRequired() ? "required" : "not required") + "."));
+						li().withText(" change into ")
+								.with(span().withClass(elProperty.getUProperty().getRequired() ? "missing" : "")
+										.withText((elProperty.getUProperty().getRequired() ? "required" : "not required")
+						)));
 
 				if (changeDescriptionI) {
-					nestedUl.with(li().withText("notes").with(del(elProperty.getProperty().getDescription()).withClass("comment"))
-							.withText(" change into")
+					nestedUl.with(li().withText("notes ").with(del(elProperty.getProperty().getDescription()))
+							.withText(" change into ")
 							.with(span(span((null == elProperty.getRightProperty().getDescription() ? ""
-									: elProperty.getRightProperty().getDescription())).withClass("comment"))));
+									: elProperty.getRightProperty().getDescription()))))
+					)
+					;
 				}
 				if (changeSizesI) {
-					nestedUl.with(li().withText("maxLength " + ((StringProperty) elProperty.getProperty()).getMaxLength() + " change into "
+					Integer maxLength = ((StringProperty) elProperty.getProperty()).getMaxLength();
+					nestedUl.with(li().withText("maxLength ").with(del(maxLength + ""))
+							.withText(" change into "
 							+ ((StringProperty) elProperty.getRightProperty()).getMaxLength()));
 				}
 			}
@@ -315,9 +322,7 @@ public class HtmlRender implements Render {
 		if (maximum == null && maximum2 == null) {
 			return false;
 		}
-		return !maximum
-				.equals(
-						maximum2);
+		return !maximum.equals(maximum2);
 	}
 
 
