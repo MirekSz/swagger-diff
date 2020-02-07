@@ -144,7 +144,7 @@ public class HtmlRender implements Render {
     }
 
 	private ContainerTag div_expandable(final String title, final String type) {
-		return span().with(a(rawHtml("&uArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick",
+		return span().with(a(rawHtml("&dArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick",
 				"javascript:showHide('" + type + "');"));
 	}
     private ContainerTag ol_changed(final List<ChangedEndpoint> changedEndpoints) {
@@ -171,7 +171,7 @@ public class HtmlRender implements Render {
 						addlinkToDoc(changedOperation.getOperation(), pathUrl).withText(pathUrl + " ")
 								.with(span(null == desc ? "" : desc)))
 
-						.with(ul_detail.withId(pathUrl)));
+						.with(ul_detail.withId(pathUrl).withStyle("display: none;")));
 
             }
         }
