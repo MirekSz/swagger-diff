@@ -10,10 +10,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 
 @Component
@@ -30,11 +31,14 @@ public class VersionPullerTimer {
 
 	@Autowired
 	VersionRepo repo;
+	@Autowired
+	ObjectMapper ob;
 
+	@PostConstruct
 	@Scheduled(cron = "0 0 * * * *")
 	public void run() throws Exception {
 		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor("mirek", "mirek"));
+		restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor("admin", "admin"));
 		//to disable ssl hostname verifier
 		restTemplate.setRequestFactory(new SimpleClientHttpRequestFactory() {
 		   @Override
@@ -47,7 +51,7 @@ public class VersionPullerTimer {
 		});
 
 		ResponseEntity<Map> forEntity =
-				restTemplate.getForEntity("https://test.verto.streamsoft.pl/next-app/services/rest/swagger.json", Map.class);
+				restTemplate.getForEntity("http://strumyk-next-client-db:8060/next-app/services/rest/swagger.json", Map.class);
 		Map body = forEntity.getBody();
 
 		String object = (String) ((Map) body.get("info")).get("version");
@@ -57,7 +61,7 @@ public class VersionPullerTimer {
 		String name = Joiner.on(",").join(verisons);
 		Version findByName = repo.findByName(name);
 		if (findByName == null) {
-			String hash = save(body.toString());
+			String hash = save(body);
 			Version version = new Version();
 			version.setName(name);
 			version.setHash(hash);
@@ -65,9 +69,9 @@ public class VersionPullerTimer {
 		}
 	}
 
-	public static String save(final String content) throws Exception {
-		String encryptedString = DigestUtils.md5Hex(content);
-		FileUtils.writeStringToFile(
+	public String save(final Map content) throws Exception {
+		String encryptedString = DigestUtils.md5Hex(content.toString());
+		ob.writeValue(
 				new File(new File("").getAbsolutePath() + File.separator + "versions" + File.separator + encryptedString + "-swagger.json"),
 				content);
 		return encryptedString;
