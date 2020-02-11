@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.ui.Model;
 
 import com.deepoove.swagger.diff.SwaggerDiff;
 import com.deepoove.swagger.diff.model.ChangedEndpoint;
@@ -58,8 +59,11 @@ public class HtmlRender implements Render {
     }
 
 
-    @Override
+	@Override
 	public String render(final SwaggerDiff diff) {
+		return render(diff, null);
+    }
+	public String render(final SwaggerDiff diff, final Model model) {
         List<Endpoint> newEndpoints = diff.getNewEndpoints();
         ContainerTag ol_newEndpoint = ol_newEndpoint(newEndpoints);
 
@@ -70,8 +74,15 @@ public class HtmlRender implements Render {
         ContainerTag ol_changed = ol_changed(changedEndpoints);
 
         ContainerTag p_versions = p_versions(diff.getOldVersion(), diff.getNewVersion());
-
-        return renderHtml(ol_newEndpoint, ol_missingEndpoint, ol_changed, p_versions);
+		if (model != null) {
+			model.addAttribute("newC", ol_newEndpoint.toString());
+			model.addAttribute("missing", ol_missingEndpoint.toString());
+			model.addAttribute("changed", ol_changed.toString());
+			model.addAttribute("versions", p_versions.toString());
+			return null;
+		} else {
+			return renderHtml(ol_newEndpoint, ol_missingEndpoint, ol_changed, p_versions);
+		}
     }
 
     public String renderHtml(final ContainerTag ol_new, final ContainerTag ol_miss, final ContainerTag ol_changed, final ContainerTag p_versions) {
@@ -97,7 +108,8 @@ public class HtmlRender implements Render {
     }
 
     private ContainerTag div_headArticle(final String title, final String type, final ContainerTag ol) {
-        return div().with(h2(title).with(a(rawHtml("&uArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick", "javascript:showHide('" + type + "');")), hr(), ol);
+		return div().with(h2(title).with(a(rawHtml("&uArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick",
+				"javascript:showHide('" + type + "');return false")), hr(), ol);
     }
 
     private ContainerTag p_versions(final String oldVersion, final String newVersion) {
@@ -145,7 +157,7 @@ public class HtmlRender implements Render {
 
 	private ContainerTag div_expandable(final String title, final String type) {
 		return span().with(a(rawHtml("&dArr;")).withId("btn_" + type).withClass("showhide").withHref("#").attr("onClick",
-				"javascript:showHide('" + type + "');"));
+				"javascript:showHide('" + type + "');return false"));
 	}
     private ContainerTag ol_changed(final List<ChangedEndpoint> changedEndpoints) {
         if (null == changedEndpoints) {
@@ -192,7 +204,7 @@ public class HtmlRender implements Render {
         for (ElProperty prop : delProps) {
 			ul.with(li_missingProp(prop, null));
         }
-		addChangedProperty(changedOperation, ul);
+		addChangedProperty(changedOperation.getChangedProps(), ul);
         return ul;
     }
 
@@ -237,7 +249,8 @@ public class HtmlRender implements Render {
             if (changeRequired || changeDescription) {
 				ul.with(li_changedParam(param));
 			}
-			addChangedProperty(changedOperation, ul);
+			addChangedProperty(changedOperation.getChangedProps(), ul);
+			addChangedProperty(param.getChanged(), ul);
         }
         for (ChangedParameter param : changedParameters) {
             List<ElProperty> missing = param.getMissing();
@@ -276,8 +289,8 @@ public class HtmlRender implements Render {
         return li;
     }
 
-	private void addChangedProperty(final ChangedOperation changedOperation, final ContainerTag ul) {
-		for (ElProperty elProperty : changedOperation.getChangedProps()) {
+	private void addChangedProperty(final List<ElProperty> changedProps, final ContainerTag ul) {
+		for (ElProperty elProperty : changedProps) {
 			boolean changeRequiredI = elProperty.getProperty().getRequired() != elProperty.getRightProperty().getRequired();
 			boolean changeDescriptionI =
 					!StringUtils.equals(elProperty.getProperty().getDescription(), elProperty.getRightProperty().getDescription());
@@ -285,7 +298,7 @@ public class HtmlRender implements Render {
 			if (elProperty.getProperty() instanceof StringProperty) {
 				changeSizesI = maxChanged(elProperty);
 			}
-			if (changeRequiredI || changeDescriptionI) {
+			if (changeRequiredI || changeDescriptionI || changeSizesI) {
 				ContainerTag nestedUl = ul().withClass("nested");
 				ContainerTag li = li().withText(elProperty.getEl()).with(nestedUl);
 				ul.with(li);

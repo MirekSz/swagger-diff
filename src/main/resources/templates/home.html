@@ -3,41 +3,89 @@
 <head>
 <meta charset="UTF-8" />
 <title>Api changelog</title>
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<link
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+	crossorigin="anonymous">
+<link
+	href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+	rel="stylesheet"
+	integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+	crossorigin="anonymous">
 <link rel="stylesheet" href="demo.css" />
 <style type="text/css">
 </style>
-<script
-			  src="https://code.jquery.com/jquery-3.4.1.min.js"
-			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-			  crossorigin="anonymous"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+	integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	crossorigin="anonymous"></script>
+<link
+	href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css"
+	rel="stylesheet" />
+<script type="text/javascript">
+	function showHide(id) {
+		if (document.getElementById(id).style.display == 'none') {
+			document.getElementById(id).style.display = 'block';
+			document.getElementById('btn_' + id).innerHTML = '&uArr;';
+		} else {
+			document.getElementById(id).style.display = 'none';
+			document.getElementById('btn_' + id).innerHTML = '&dArr;';
+		}
+		return false;
+	}
+</script>
 </head>
 <body>
 	<header>
-		<h1>Api change log</h1>
+		<h1>API Changelog</h1>
 	</header>
-<select class="js-data-example-ajax" style="width:400px;display:inline" ></select>
-<select class="js-data-example-ajax" style="width:400px;display:inline" ></select>
-
-	<div class="article">
+	<div class="actions_con">
+		<form method="post">
+			<div class="row actions">
+				<div class="col-sm-5 text-center">
+					<select name="api1" class="js-data-example-ajax form-control"
+						style="width: 400px; display: inline" required="required"></select>
+				</div>
+				<div class="" style="width: 15px; margin-left: 10px">VS</div>
+				<div class="col-sm-5 text-center ">
+					<select name="api2" class="js-data-example-ajax form-control"
+						style="width: 400px; display: inline" required="required"></select>
+				</div>
+				<div class="col-sm-1 text-right">
+					<button class="btn btn-success" type="submit">Compare</button>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="article" th:inline="text">
+		<div th:if="${versions!=null}">
+			<h2>
+				Versions<a id="btn_versions" class="showhide" href="#"
+					onclick="javascript:showHide('versions');">⇑</a>
+			</h2>
+			<hr>
+			<span th:utext="${versions}"></span>
+		</div>
 		<div>
 			<h2>What's New</h2>
 			<hr>
+			<span th:utext="${newC}"></span>
 		</div>
 
 		<div>
 			<h2>What's Deprecated</h2>
 			<hr>
+			<span th:utext="${missing}"></span>
 		</div>
 
 		<div>
 			<h2>What's Changed</h2>
 			<hr>
+			<span th:utext="${changed}"></span>
 		</div>
 	</div>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-<script src="app.js" ></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<script src="app.js"></script>
 </html>

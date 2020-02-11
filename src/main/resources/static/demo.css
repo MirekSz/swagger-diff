@@ -16,7 +16,13 @@ th, td /* table elements 表格元素 */ {
   margin: 0;
   padding: 0;
 }
-
+.actions{
+	padding-top:10px;
+}
+.actions_con{
+	margin: 0px auto;
+	max-width: 960px;
+}
 /** 设置默认字体 **/
 body,
 button, input, select, textarea /* for ie */ {
@@ -99,7 +105,7 @@ h3 {
 	margin: 0px auto;
 	box-shadow: 0px 0px 4px #ccc;
 	background: #fff;
-	margin-top: 40px;
+	margin-top: 20px;
 }
 
 .article>div {
