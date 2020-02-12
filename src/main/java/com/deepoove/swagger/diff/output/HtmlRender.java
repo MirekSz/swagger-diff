@@ -233,9 +233,9 @@ public class HtmlRender implements Render {
         List<Parameter> addParameters = changedOperation.getAddParameters();
         List<Parameter> delParameters = changedOperation.getMissingParameters();
         List<ChangedParameter> changedParameters = changedOperation.getChangedParameter();
-        ContainerTag ul = ul().withClass("change param");
+		ContainerTag ul = ul().withClass("change param");
         for (Parameter param : addParameters) {
-            ul.with(li_addParam(param));
+			ul.with(li_addParam(param));
         }
         for (ChangedParameter param : changedParameters) {
             List<ElProperty> increased = param.getIncreased();
@@ -300,7 +300,11 @@ public class HtmlRender implements Render {
 			}
 			if (changeRequiredI || changeDescriptionI || changeSizesI) {
 				ContainerTag nestedUl = ul().withClass("nested");
-				ContainerTag li = li().withText(elProperty.getEl()).with(nestedUl);
+				String text = elProperty.getEl();
+				if (text.startsWith("body.")) {
+					text = text.substring(5);
+				}
+				ContainerTag li = li().withText(text).with(nestedUl);
 				ul.with(li);
 
 				nestedUl.with(
