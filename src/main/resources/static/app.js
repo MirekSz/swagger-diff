@@ -8,7 +8,7 @@ function formatState (state) {
 	  }
 
 	  var $state = $(
-	    '<div><i class="fa fa-paper-plane" aria-hidden="true"></i> <span></span> <ul></ul></div>'
+	    '<div><i class="fa fa-paper-plane" aria-hidden="true"></i> <span></span> <ul class="ulresult"></ul></div>'
 	  );
 
 	  // Use .text() instead of HTML string concatenation to avoid script injection issues
@@ -20,6 +20,7 @@ function formatState (state) {
 	  return $state;
 	};
 	$('.js-data-example-ajax').select2({
+		  theme: 'bootstrap4',
 		templateResult: formatState,
 		templateSelection: formatState,
 	  ajax: {

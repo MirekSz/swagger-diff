@@ -16,6 +16,14 @@ th, td /* table elements 表格元素 */ {
   margin: 0;
   padding: 0;
 }
+.select2-results__option{
+}
+ul.ulresult {
+	margin-bottom:-10px;
+}
+ul.ulresult>li {
+	margin-top:-10px;
+}
 .actions{
 	padding-top:10px;
 }
